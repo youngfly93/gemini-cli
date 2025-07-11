@@ -16,6 +16,7 @@ With the Gemini CLI you can:
   Veo or Lyria](https://github.com/GoogleCloudPlatform/vertex-ai-creative-studio/tree/main/experiments/mcp-genmedia)
 - Ground your queries with the [Google Search](https://ai.google.dev/gemini-api/docs/grounding)
   tool, built in to Gemini.
+- **🆕 Create custom slash commands** to extend the CLI with your own reusable workflows and automation.
 
 ## Quickstart
 
@@ -92,6 +93,7 @@ gemini
 
 - Learn how to [contribute to or build from the source](./CONTRIBUTING.md).
 - Explore the available **[CLI Commands](./docs/cli/commands.md)**.
+- **🆕 Create [Custom Slash Commands](./docs/CUSTOM_SLASH_COMMANDS.md)** to extend the CLI with your own workflows.
 - If you encounter any issues, review the **[Troubleshooting guide](./docs/troubleshooting.md)**.
 - For more comprehensive documentation, see the [full documentation](./docs/index.md).
 - Take a look at some [popular tasks](#popular-tasks) for more inspiration.
@@ -136,6 +138,40 @@ Use MCP servers to integrate your local system tools with your enterprise collab
 ```text
 > Make a full-screen web app for a wall display to show our most interacted-with GitHub issues.
 ```
+
+### 🆕 Custom Slash Commands
+
+Create your own reusable commands to streamline repetitive tasks and workflows:
+
+```bash
+# Create a simple build command
+echo '{"name": "build", "description": "Build project", "command": "npm run build"}' > .gemini/commands/build.json
+
+# Use it in Gemini CLI
+> /build
+```
+
+```typescript
+// Advanced TypeScript command with custom logic
+// .gemini/commands/deploy.ts
+export default {
+  name: 'deploy',
+  description: 'Deploy to staging with confirmation',
+  async execute(args: string[]) {
+    const env = args[0] || 'staging';
+    return { type: 'shell', command: `npm run deploy:${env}` };
+  }
+} as SlashCommand;
+```
+
+**Key Features:**
+- 🔄 **Hot-reload** during development
+- 📁 **Project & personal scopes** 
+- 🎯 **Override built-in commands**
+- 🛠️ **Multiple formats** (TypeScript, JSON, YAML, Markdown)
+- 🏷️ **Rich metadata** (categories, tags, versioning)
+
+👉 **[Get Started with Custom Commands →](./docs/CUSTOM_SLASH_COMMANDS.md)**
 
 ### Interact with your system
 

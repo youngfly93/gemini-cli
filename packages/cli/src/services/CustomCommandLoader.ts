@@ -13,7 +13,6 @@ import {
   SlashCommand,
   CommandScope,
   CommandSourceFormat,
-  CustomCommandMetadata,
 } from '../ui/commands/types.js';
 import { Config } from '@google/gemini-cli-core';
 
@@ -174,6 +173,9 @@ export class CustomCommandLoader {
           break;
         case 'markdown':
           command = await this.loadMarkdownCommand(filePath);
+          break;
+        default:
+          console.warn(`Unknown command format: ${sourceFormat}`);
           break;
       }
 
@@ -405,7 +407,7 @@ export class CustomCommandLoader {
    */
   private sanitizeCommandName(name: string): string {
     // If the name contains only non-ASCII characters, use a transliteration or default
-    const ascii = name.replace(/[^\x00-\x7F]/g, ''); // Remove non-ASCII characters
+    const ascii = name.replace(/[^\u0020-\u007F]/g, ''); // Remove non-printable ASCII characters
     
     if (ascii.trim().length === 0) {
       // If no ASCII characters remain, use filename-based approach or a default
@@ -537,50 +539,57 @@ export class CustomCommandLoader {
   /**
    * Validate a command object
    */
-  private validateCommand(command: any): SlashCommand | null {
+  private validateCommand(command: unknown): SlashCommand | null {
     const errors: string[] = [];
 
+    // Check if command is an object
+    if (!command || typeof command !== 'object') {
+      return null;
+    }
+
+    const cmd = command as Record<string, unknown>;
+
     // Required fields
-    if (!command.name || typeof command.name !== 'string') {
+    if (!cmd.name || typeof cmd.name !== 'string') {
       errors.push('Command missing required "name" property');
     } else {
       // Validate name format
-      if (!/^[a-zA-Z][a-zA-Z0-9-]*$/.test(command.name)) {
+      if (!/^[a-zA-Z][a-zA-Z0-9-]*$/.test(cmd.name as string)) {
         errors.push('Command name must start with a letter and contain only letters, numbers, and hyphens');
       }
     }
 
-    if (command.description && typeof command.description !== 'string') {
+    if (cmd.description && typeof cmd.description !== 'string') {
       errors.push('Command "description" must be a string');
     }
 
     // Validate altName if provided
-    if (command.altName) {
-      if (typeof command.altName !== 'string') {
+    if (cmd.altName) {
+      if (typeof cmd.altName !== 'string') {
         errors.push('Command "altName" must be a string');
-      } else if (!/^[a-zA-Z][a-zA-Z0-9-]*$/.test(command.altName)) {
+      } else if (!/^[a-zA-Z][a-zA-Z0-9-]*$/.test(cmd.altName as string)) {
         errors.push('Command altName must start with a letter and contain only letters, numbers, and hyphens');
       }
     }
 
     // Validate action function if provided
-    if (command.action && typeof command.action !== 'function') {
+    if (cmd.action && typeof cmd.action !== 'function') {
       errors.push('Command "action" must be a function');
     }
 
     // Validate completion function if provided
-    if (command.completion && typeof command.completion !== 'function') {
+    if (cmd.completion && typeof cmd.completion !== 'function') {
       errors.push('Command "completion" must be a function');
     }
 
     // Validate subCommands if provided
-    if (command.subCommands) {
-      if (!Array.isArray(command.subCommands)) {
+    if (cmd.subCommands) {
+      if (!Array.isArray(cmd.subCommands)) {
         errors.push('Command "subCommands" must be an array');
       } else {
         // Recursively validate sub-commands
-        for (let i = 0; i < command.subCommands.length; i++) {
-          const subCommand = this.validateCommand(command.subCommands[i]);
+        for (let i = 0; i < (cmd.subCommands as unknown[]).length; i++) {
+          const subCommand = this.validateCommand((cmd.subCommands as unknown[])[i]);
           if (!subCommand) {
             errors.push(`Invalid sub-command at index ${i}`);
           }
@@ -589,11 +598,11 @@ export class CustomCommandLoader {
     }
 
     // Validate metadata if provided
-    if (command.metadata) {
-      if (typeof command.metadata !== 'object') {
+    if (cmd.metadata) {
+      if (typeof cmd.metadata !== 'object') {
         errors.push('Command "metadata" must be an object');
       } else {
-        const meta = command.metadata;
+        const meta = cmd.metadata as Record<string, unknown>;
         
         if (meta.category && typeof meta.category !== 'string') {
           errors.push('Metadata "category" must be a string');
@@ -601,8 +610,8 @@ export class CustomCommandLoader {
         
         if (meta.tags && !Array.isArray(meta.tags)) {
           errors.push('Metadata "tags" must be an array');
-        } else if (meta.tags) {
-          for (const tag of meta.tags) {
+        } else if (meta.tags && Array.isArray(meta.tags)) {
+          for (const tag of meta.tags as unknown[]) {
             if (typeof tag !== 'string') {
               errors.push('All tags must be strings');
               break;
@@ -625,16 +634,16 @@ export class CustomCommandLoader {
     }
 
     // Check for conflicting properties
-    if (command.action && command.subCommands && command.subCommands.length > 0) {
-      console.warn(`Command "${command.name}" has both action and subCommands. Action will be ignored when subCommands are present.`);
+    if (cmd.action && cmd.subCommands && Array.isArray(cmd.subCommands) && (cmd.subCommands as unknown[]).length > 0) {
+      console.warn(`Command "${cmd.name}" has both action and subCommands. Action will be ignored when subCommands are present.`);
     }
 
     if (errors.length > 0) {
-      console.error(`Command validation failed for "${command.name || 'unknown'}":`, errors);
+      console.error(`Command validation failed for "${cmd.name || 'unknown'}":`, errors);
       return null;
     }
 
-    return command as SlashCommand;
+    return cmd as unknown as SlashCommand;
   }
 
   /**
