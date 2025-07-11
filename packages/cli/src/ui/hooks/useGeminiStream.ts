@@ -247,6 +247,10 @@ export const useGeminiStream = (
               prompt_id,
             };
             scheduleToolCalls([toolCallRequest], abortSignal);
+            return { queryToSend: null, shouldProceed: false };
+          } else if (slashCommandResult.type === 'send_to_ai') {
+            // Send the content to AI as a prompt
+            return { queryToSend: slashCommandResult.content, shouldProceed: true };
           }
 
           return { queryToSend: null, shouldProceed: false };
