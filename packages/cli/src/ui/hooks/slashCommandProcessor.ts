@@ -187,15 +187,28 @@ export const useSlashCommandProcessor = (
     ],
   );
 
-  const commandService = useMemo(() => new CommandService(), []);
+  const commandService = useMemo(() => {
+    const projectRoot = config?.getProjectRoot() || process.cwd();
+    return new CommandService(undefined, config, projectRoot);
+  }, [config]);
 
   useEffect(() => {
     const load = async () => {
       await commandService.loadCommands();
       setCommands(commandService.getCommands());
+      
+      // Start watching for custom command changes in development
+      if (process.env.NODE_ENV === 'development' || process.env.DEV) {
+        await commandService.startWatching();
+      }
     };
 
     load();
+
+    // Cleanup on unmount
+    return () => {
+      commandService.dispose();
+    };
   }, [commandService]);
 
   const savedChatTags = useCallback(async () => {
@@ -1140,6 +1153,12 @@ export const useSlashCommandProcessor = (
                     );
                   }
                 }
+              case 'ai-prompt':
+                // Return the content as a prompt to be sent to AI
+                return { 
+                  type: 'send_to_ai', 
+                  content: result.content 
+                };
               default: {
                 const unhandled: never = result;
                 throw new Error(`Unhandled slash command result: ${unhandled}`);

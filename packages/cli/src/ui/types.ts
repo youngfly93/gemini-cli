@@ -228,4 +228,8 @@ export type SlashCommandProcessorResult =
     }
   | {
       type: 'handled'; // Indicates the command was processed and no further action is needed.
+    }
+  | {
+      type: 'send_to_ai'; // Indicates the content should be sent to AI as a prompt.
+      content: string;
     };

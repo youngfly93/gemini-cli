@@ -69,10 +69,51 @@ export interface OpenDialogActionReturn {
   dialog: 'help';
 }
 
+/**
+ * The return type for a command action that sends content to AI as a prompt.
+ */
+export interface AiPromptActionReturn {
+  type: 'ai-prompt';
+  content: string;
+}
+
 export type SlashCommandActionReturn =
   | ToolActionReturn
   | MessageActionReturn
-  | OpenDialogActionReturn;
+  | OpenDialogActionReturn
+  | AiPromptActionReturn;
+
+/**
+ * Scope where a custom command is defined
+ */
+export type CommandScope = 'builtin' | 'project' | 'personal';
+
+/**
+ * Source format for custom commands
+ */
+export type CommandSourceFormat = 'typescript' | 'json' | 'yaml' | 'markdown';
+
+/**
+ * Metadata for custom commands
+ */
+export interface CustomCommandMetadata {
+  /** Source scope: builtin, project (.gemini/commands/), or personal (~/.gemini/commands/) */
+  scope: CommandScope;
+  /** Format of the source file */
+  sourceFormat?: CommandSourceFormat;
+  /** Path to the source file */
+  sourcePath?: string;
+  /** Category for organization (e.g., 'git', 'build', 'test') */
+  category?: string;
+  /** Tags for searching and filtering */
+  tags?: string[];
+  /** Whether this command can execute shell commands */
+  canExecuteShell?: boolean;
+  /** Author information for custom commands */
+  author?: string;
+  /** Version of the command */
+  version?: string;
+}
 
 // The standardized contract for any command in the system.
 export interface SlashCommand {
@@ -96,4 +137,7 @@ export interface SlashCommand {
   ) => Promise<string[]>;
 
   subCommands?: SlashCommand[];
+  
+  /** Metadata for custom commands (optional, used by CustomCommandLoader) */
+  metadata?: CustomCommandMetadata;
 }
