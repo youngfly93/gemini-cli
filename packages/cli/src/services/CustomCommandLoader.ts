@@ -750,7 +750,9 @@ export class CustomCommandLoader {
    * Get all loaded commands
    */
   getAllCommands(): SlashCommand[] {
-    return Array.from(this.commands.values());
+    // Remove duplicates (same command object stored under multiple keys)
+    const uniqueCommands = new Set(this.commands.values());
+    return Array.from(uniqueCommands);
   }
 
   /**
