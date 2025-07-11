@@ -73,7 +73,9 @@ export class CommandService {
       }
     }
 
-    this.commands = Array.from(commandMap.values());
+    // Remove duplicates (same command object stored under multiple keys)
+    const uniqueCommands = new Set(commandMap.values());
+    this.commands = Array.from(uniqueCommands);
   }
 
   getCommands(): SlashCommand[] {
