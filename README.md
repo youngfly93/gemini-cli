@@ -1,8 +1,10 @@
-# Gemini CLI
+# Gemini CLI (Enhanced Fork)
 
-[![Gemini CLI CI](https://github.com/google-gemini/gemini-cli/actions/workflows/ci.yml/badge.svg)](https://github.com/google-gemini/gemini-cli/actions/workflows/ci.yml)
+[![Gemini CLI CI](https://github.com/youngfly93/gemini-cli/actions/workflows/ci.yml/badge.svg)](https://github.com/youngfly93/gemini-cli/actions/workflows/ci.yml)
 
 ![Gemini CLI Screenshot](./docs/assets/gemini-screenshot.png)
+
+> **🚀 Enhanced Fork** - This is an enhanced version of the [official Gemini CLI](https://github.com/google-gemini/gemini-cli) with additional features and improvements.
 
 This repository contains the Gemini CLI, a command-line AI workflow tool that connects to your
 tools, understands your code and accelerates your workflows.
@@ -18,26 +20,50 @@ With the Gemini CLI you can:
   tool, built in to Gemini.
 - **🆕 Create custom slash commands** to extend the CLI with your own reusable workflows and automation.
 
+## 🌟 Enhanced Features (Compared to Official Version)
+
+This fork includes several enhancements over the original Google Gemini CLI:
+
+### ✨ Comprehensive Custom Slash Commands System
+- **Advanced TypeScript Support**: Full TypeScript integration for command development
+- **Multiple Command Formats**: Support for TypeScript, JSON, YAML, and Markdown command definitions
+- **Hot-Reload Development**: Commands automatically reload during development
+- **Scoped Commands**: Project-level (`.gemini/commands/`) and personal (`~/.gemini/commands/`) command scopes
+- **Rich Metadata**: Categories, tags, versioning, and detailed command descriptions
+- **Command Override**: Ability to override built-in commands with custom implementations
+- **Enhanced Command Discovery**: Improved command listing with better organization
+
+### 🔧 Infrastructure Improvements
+- **Enhanced CI/CD**: Improved GitHub Actions workflows
+- **Better Documentation**: Comprehensive documentation for custom commands
+- **Code Quality**: Refined code structure and better test coverage
+- **Authentication Enhancements**: Improved OAuth2 and API key handling
+
+### 📚 Documentation Enhancements
+- **Custom Commands Guide**: Detailed documentation for creating custom slash commands
+- **CLAUDE.md Integration**: Improved Claude Code integration guide
+- **Enhanced Configuration**: Better configuration options and settings
+
 ## Quickstart
 
 1. **Prerequisites:** Ensure you have [Node.js version 20](https://nodejs.org/en/download) or higher installed.
-2. **Run the CLI:** Execute the following command in your terminal:
+2. **Run the Enhanced CLI:** Execute the following command in your terminal:
 
    ```bash
-   npx https://github.com/google-gemini/gemini-cli
+   npx https://github.com/youngfly93/gemini-cli
    ```
 
-   Or install it with:
+   Or install it directly:
 
    ```bash
-   npm install -g @google/gemini-cli
+   npm install -g https://github.com/youngfly93/gemini-cli
    gemini
    ```
 
 3. **Pick a color theme**
 4. **Authenticate:** When prompted, sign in with your personal Google account. This will grant you up to 60 model requests per minute and 1,000 model requests per day using Gemini.
 
-You are now ready to use the Gemini CLI!
+You are now ready to use the Enhanced Gemini CLI!
 
 ### Use a Gemini API key:
 
@@ -83,7 +109,7 @@ gemini
 Or work with an existing project:
 
 ```sh
-git clone https://github.com/google-gemini/gemini-cli
+git clone https://github.com/youngfly93/gemini-cli
 cd gemini-cli
 gemini
 > Give me a summary of all of the changes that went in yesterday
@@ -139,7 +165,7 @@ Use MCP servers to integrate your local system tools with your enterprise collab
 > Make a full-screen web app for a wall display to show our most interacted-with GitHub issues.
 ```
 
-### 🆕 Custom Slash Commands
+### 🆕 Enhanced Custom Slash Commands
 
 Create your own reusable commands to streamline repetitive tasks and workflows:
 
@@ -154,9 +180,12 @@ echo '{"name": "build", "description": "Build project", "command": "npm run buil
 ```typescript
 // Advanced TypeScript command with custom logic
 // .gemini/commands/deploy.ts
+import { SlashCommand } from '@google/gemini-cli';
+
 export default {
   name: 'deploy',
   description: 'Deploy to staging with confirmation',
+  category: 'deployment',
   async execute(args: string[]) {
     const env = args[0] || 'staging';
     return { type: 'shell', command: `npm run deploy:${env}` };
@@ -164,14 +193,28 @@ export default {
 } as SlashCommand;
 ```
 
-**Key Features:**
+```yaml
+# YAML command definition
+# .gemini/commands/test.yaml
+name: test
+description: Run project tests
+category: development
+metadata:
+  tags: [testing, ci]
+  version: "1.0.0"
+command: npm test
+```
+
+**Enhanced Features:**
 - 🔄 **Hot-reload** during development
 - 📁 **Project & personal scopes** 
 - 🎯 **Override built-in commands**
 - 🛠️ **Multiple formats** (TypeScript, JSON, YAML, Markdown)
 - 🏷️ **Rich metadata** (categories, tags, versioning)
+- 📝 **Markdown commands** for documentation-driven commands
+- 🔍 **Enhanced discovery** with better organization
 
-👉 **[Get Started with Custom Commands →](./docs/CUSTOM_SLASH_COMMANDS.md)**
+👉 **[Get Started with Enhanced Custom Commands →](./docs/CUSTOM_SLASH_COMMANDS.md)**
 
 ### Interact with your system
 
@@ -186,6 +229,23 @@ export default {
 ### Uninstall
 
 Head over to the [Uninstall](docs/Uninstall.md) guide for uninstallation instructions.
+
+## 🔗 Links
+
+- **Original Repository**: [google-gemini/gemini-cli](https://github.com/google-gemini/gemini-cli)
+- **Enhanced Fork**: [youngfly93/gemini-cli](https://github.com/youngfly93/gemini-cli)
+- **Issues & Feature Requests**: [GitHub Issues](https://github.com/youngfly93/gemini-cli/issues)
+
+## 🤝 Contributing
+
+We welcome contributions! Please see [CONTRIBUTING.md](./CONTRIBUTING.md) for guidelines.
+
+To sync with the upstream repository:
+```bash
+git remote add upstream https://github.com/google-gemini/gemini-cli.git
+git fetch upstream
+git merge upstream/main
+```
 
 ## Terms of Service and Privacy Notice
 
